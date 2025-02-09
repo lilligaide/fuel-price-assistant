@@ -1,21 +1,19 @@
 enable_testing()
 
-# Find GTest package
-find_package(GTest REQUIRED)
-
 # Add test executable
 add_executable(unit_tests
-    StationServiceTest.cpp
-    DatabaseTest.cpp
-    GeocodingTest.cpp
+    TankerkoenigAPITest.cpp
+    TeamsNotificationTest.cpp
+    ConfigTest.cpp
 )
 
 # Link test dependencies
 target_link_libraries(unit_tests
     PRIVATE
-    GTest::GTest
-    GTest::Main
-    ${PROJECT_NAME}_lib  # Link to main project library
+    Catch2::Catch2WithMain
+    CURL::libcurl
+    nlohmann_json::nlohmann_json
+    fmt::fmt
 )
 
 # Add tests to CTest

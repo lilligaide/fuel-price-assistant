@@ -1,35 +1,47 @@
 #pragma once
 
 #include <string>
+#include <vector>
+#include <map>
 #include <nlohmann/json.hpp>
 
-struct APIConfig {
-    std::string endpoint = "https://api.openchargemap.io/v3";
-    std::string key = "7c4dfce6-966f-4239-b1e2-a95c86e0dbe3";  // Replace in production
-    int timeout_ms = 5000;
-    bool verify_ssl = true;
+namespace utils {
+
+struct NotificationConfig {
+    std::string type;  // "teams", "email", "mqtt", etc.
+    std::map<std::string, std::string> settings;
+    
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(NotificationConfig, type, settings)
+};
+
+struct LocationConfig {
+    double latitude;
+    double longitude;
+    double searchRadius;  // in kilometers
+    
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(LocationConfig, latitude, longitude, searchRadius)
+};
+
+struct MonitoringConfig {
+    std::vector<std::string> fuelTypes;  // "e5", "e10", "diesel"
+    int updateInterval;  // in minutes
+    double priceThreshold;  // minimum price difference to trigger notification
+    bool notifyOnIncrease;  // whether to notify when price increases
+    
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(MonitoringConfig, fuelTypes, updateInterval, 
+                                  priceThreshold, notifyOnIncrease)
 };
 
 struct Config {
-    static Config load(const std::string& configPath = "config.json");
+    std::string apiKey;
+    LocationConfig location;
+    MonitoringConfig monitoring;
+    std::vector<NotificationConfig> notifications;
     
-    int port = 8080;
-    std::string host = "0.0.0.0";
-    APIConfig api;
-    std::string db_path = "stations.db";
-    int cache_duration_seconds = 3600;
+    static Config load(const std::string& path = "config.json");
+    static Config fromEnvironment();
     
-    // SSL configuration
-    bool use_ssl = false;
-    std::string ssl_cert;
-    std::string ssl_key;
-    
-    // Rate limiting
-    int rate_limit_requests = 100;
-    int rate_limit_window_seconds = 60;
-    
-    NLOHMANN_DEFINE_TYPE_INTRUSIVE(Config, port, host, db_path, 
-                                  cache_duration_seconds, use_ssl, 
-                                  ssl_cert, ssl_key, rate_limit_requests, 
-                                  rate_limit_window_seconds)
-}; 
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(Config, apiKey, location, monitoring, notifications)
+};
+
+} // namespace utils 

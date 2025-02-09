@@ -1,35 +1,42 @@
-cmake_minimum_required(VERSION 3.15)
-project(ev_charging_finder VERSION 1.0.0 LANGUAGES CXX)
+cmake_minimum_required(VERSION 3.20)
+project(fuel-price-assistant VERSION 1.0.0 LANGUAGES CXX)
 
+# Set C++ standard
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-# Find required packages
-find_package(Crow CONFIG REQUIRED)
-find_package(OpenSSL REQUIRED)
-find_package(nlohmann_json CONFIG REQUIRED)
-find_package(cpr CONFIG REQUIRED)
-find_package(fmt CONFIG REQUIRED)
-find_package(SQLite3 REQUIRED)
-find_package(Drogon CONFIG REQUIRED)
+# Enable testing
+enable_testing()
 
-# Add source files
+# Find required packages
+find_package(CURL REQUIRED)
+find_package(nlohmann_json CONFIG REQUIRED)
+find_package(fmt CONFIG REQUIRED)
+find_package(Catch2 CONFIG REQUIRED)
+
+# Set source files
 set(SOURCES
     src/main.cpp
-    src/server/Server.cpp
-    src/server/Routes.cpp
-    src/api/ChargingAPI.cpp
-    src/api/GeocodingAPI.cpp
-    src/services/StationService.cpp
-    src/services/GeocodingService.cpp
-    src/db/Database.cpp
+    src/api/TankerkoenigAPI.cpp
+    src/notifications/TeamsNotificationService.cpp
+    src/utils/Config.cpp
 )
 
-# Create executable
-add_executable(${PROJECT_NAME} ${SOURCES})
+# Set header files
+set(HEADERS
+    include/api/TankerkoenigAPI.hpp
+    include/models/FuelStation.hpp
+    include/models/PriceStatistics.hpp
+    include/notifications/NotificationService.hpp
+    include/notifications/TeamsNotificationService.hpp
+    include/utils/Config.hpp
+)
 
-# Include directories
+# Create main executable
+add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS})
+
+# Set include directories
 target_include_directories(${PROJECT_NAME} PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/include
     ${CMAKE_CURRENT_SOURCE_DIR}/src
@@ -37,24 +44,40 @@ target_include_directories(${PROJECT_NAME} PRIVATE
 
 # Link libraries
 target_link_libraries(${PROJECT_NAME} PRIVATE
-    Crow::Crow
-    OpenSSL::SSL
-    OpenSSL::Crypto
+    CURL::libcurl
     nlohmann_json::nlohmann_json
-    cpr::cpr
     fmt::fmt
-    SQLite::SQLite3
-    Drogon::Drogon
 )
 
-# Copy static files and templates to build directory
-add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_directory
-    ${CMAKE_SOURCE_DIR}/static ${CMAKE_BINARY_DIR}/static
-    COMMAND ${CMAKE_COMMAND} -E copy_directory
-    ${CMAKE_SOURCE_DIR}/templates ${CMAKE_BINARY_DIR}/templates
+# Set compiler warnings
+if(MSVC)
+    target_compile_options(${PROJECT_NAME} PRIVATE /W4 /WX)
+else()
+    target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -Wpedantic -Werror)
+endif()
+
+# Configure tests
+add_subdirectory(tests)
+
+# Install configuration
+install(TARGETS ${PROJECT_NAME}
+    RUNTIME DESTINATION bin
+    LIBRARY DESTINATION lib
+    ARCHIVE DESTINATION lib
 )
 
-# Enable testing
-enable_testing()
-add_subdirectory(tests) 
+# Generate documentation
+find_package(Doxygen)
+if(DOXYGEN_FOUND)
+    set(DOXYGEN_IN ${CMAKE_CURRENT_SOURCE_DIR}/docs/Doxyfile.in)
+    set(DOXYGEN_OUT ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile)
+
+    configure_file(${DOXYGEN_IN} ${DOXYGEN_OUT} @ONLY)
+
+    add_custom_target(docs
+        COMMAND ${DOXYGEN_EXECUTABLE} ${DOXYGEN_OUT}
+        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+        COMMENT "Generating API documentation with Doxygen"
+        VERBATIM
+    )
+endif() 

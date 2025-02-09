@@ -1,24 +1,21 @@
 {
-    "name": "ev-charging-finder",
+    "name": "fuel-price-assistant",
     "version": "1.0.0",
     "dependencies": [
-        "crow",
-        "openssl",
+        "curl",
         "nlohmann-json",
-        "cpr",
         "fmt",
-        "sqlite3",
-        "drogon",
+        "catch2",
         {
-            "name": "openssl",
-            "platform": "!windows"
+            "name": "curl",
+            "features": ["ssl"]
         }
     ],
-    "builtin-baseline": "2023-12-19",
+    "builtin-baseline": "2024-01-20",
     "overrides": [
         {
-            "name": "openssl",
-            "version": "3.1.3"
+            "name": "curl",
+            "version": "8.5.0"
         }
     ]
 } 
