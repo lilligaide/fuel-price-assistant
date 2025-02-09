@@ -1,0 +1,47 @@
+PROJECT_NAME           = "EV Charging Station Finder"
+PROJECT_NUMBER         = @PROJECT_VERSION@
+PROJECT_BRIEF         = "A modern C++ application for finding EV charging stations"
+
+OUTPUT_DIRECTORY      = @CMAKE_CURRENT_BINARY_DIR@/docs
+INPUT                = @CMAKE_CURRENT_SOURCE_DIR@/include \
+                      @CMAKE_CURRENT_SOURCE_DIR@/src \
+                      @CMAKE_CURRENT_SOURCE_DIR@/README.md
+
+RECURSIVE            = YES
+EXTRACT_ALL          = YES
+EXTRACT_PRIVATE      = YES
+EXTRACT_STATIC       = YES
+
+GENERATE_HTML        = YES
+GENERATE_LATEX       = NO
+GENERATE_MAN        = NO
+GENERATE_RTF        = NO
+
+HAVE_DOT             = YES
+UML_LOOK            = YES
+CALL_GRAPH          = YES
+CALLER_GRAPH        = YES
+
+USE_MDFILE_AS_MAINPAGE = @CMAKE_CURRENT_SOURCE_DIR@/README.md
+
+OPTIMIZE_OUTPUT_FOR_C  = NO
+BUILTIN_STL_SUPPORT   = YES
+
+ALIASES += "rest=\xrefitem rest \"REST API\" \"REST API\""
+ALIASES += "route=\xrefitem route \"Route\" \"Routes\""
+
+WARN_IF_UNDOCUMENTED = YES
+WARN_IF_DOC_ERROR    = YES
+WARN_NO_PARAMDOC     = YES
+
+HTML_DYNAMIC_SECTIONS = YES
+INTERACTIVE_SVG      = YES
+DOT_IMAGE_FORMAT     = svg
+DOT_TRANSPARENT      = YES
+
+COLLABORATION_GRAPH  = YES
+CLASS_GRAPH         = YES
+INCLUDE_GRAPH       = YES
+INCLUDED_BY_GRAPH   = YES
+
+PREDEFINED          = DOXYGEN_SHOULD_SKIP_THIS 
