@@ -1,0 +1,49 @@
+name: Security Scan
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    - cron: '0 0 * * 0'  # Run weekly
+
+jobs:
+  security:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v2
+      with:
+        languages: cpp
+
+    - name: Build for CodeQL
+      run: |
+        mkdir build && cd build
+        cmake ..
+        make
+
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v2
+
+    - name: Run Snyk to check for vulnerabilities
+      uses: snyk/actions/cpp@master
+      env:
+        SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+      with:
+        args: --severity-threshold=high
+
+    - name: Check dependencies for known vulnerabilities
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y owasp-dependency-check
+        dependency-check --scan . --format JSON --out dependency-report.json
+
+    - name: Upload dependency scan results
+      uses: actions/upload-artifact@v3
+      with:
+        name: dependency-scan-results
+        path: dependency-report.json 

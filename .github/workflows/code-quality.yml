@@ -1,0 +1,40 @@
+name: Code Quality
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  code-quality:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y clang-format cppcheck
+
+    - name: Check code formatting
+      run: |
+        find . -name '*.cpp' -o -name '*.hpp' | xargs clang-format --dry-run --Werror
+
+    - name: Static code analysis
+      run: |
+        cppcheck --enable=all --error-exitcode=1 \
+          --suppress=missingInclude \
+          --suppress=unmatchedSuppression \
+          --suppress=unusedFunction \
+          --suppress=noExplicitConstructor \
+          src/ include/
+
+    - name: Check for memory leaks
+      run: |
+        sudo apt-get install -y valgrind
+        mkdir -p build && cd build
+        cmake -DCMAKE_BUILD_TYPE=Debug ..
+        make
+        valgrind --leak-check=full --error-exitcode=1 ./unit_tests 
