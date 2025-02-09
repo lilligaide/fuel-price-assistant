@@ -5,6 +5,7 @@ add_executable(unit_tests
     TankerkoenigAPITest.cpp
     TeamsNotificationTest.cpp
     ConfigTest.cpp
+    RouteCalculatorTest.cpp
 )
 
 # Link test dependencies

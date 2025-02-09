@@ -1,0 +1,22 @@
+{
+    "apiKey": "your-tankerkoenig-api-key",
+    "location": {
+        "latitude": 52.520008,
+        "longitude": 13.404954,
+        "searchRadius": 5.0
+    },
+    "monitoring": {
+        "fuelTypes": ["e5", "e10", "diesel"],
+        "updateInterval": 15,
+        "priceThreshold": 0.05,
+        "notifyOnIncrease": true
+    },
+    "notifications": [
+        {
+            "type": "teams",
+            "settings": {
+                "webhookUrl": "your-teams-webhook-url"
+            }
+        }
+    ]
+} 

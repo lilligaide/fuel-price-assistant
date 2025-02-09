@@ -21,6 +21,7 @@ set(SOURCES
     src/api/TankerkoenigAPI.cpp
     src/notifications/TeamsNotificationService.cpp
     src/utils/Config.cpp
+    src/utils/RouteCalculator.cpp
 )
 
 # Set header files
@@ -31,6 +32,7 @@ set(HEADERS
     include/notifications/NotificationService.hpp
     include/notifications/TeamsNotificationService.hpp
     include/utils/Config.hpp
+    include/utils/RouteCalculator.hpp
 )
 
 # Create main executable
